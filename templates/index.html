@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mango leaf Disease Classification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="file"]:hover {
+            border-color: #0056b3;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            background-color: #003d7a;
+        }
+
+        .footer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 20px;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9f7ff;
+            border: 1px solid #b3d7ff;
+            display: none;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload an Image for Classification</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">Classify</button>
+        </form>
+        
+        <div id="result" class="result"></div>
+
+        <div class="footer">
+            <p>Powered by TechTitans</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+            let resultDiv = document.getElementById('result');
+
+            // Reset result div content
+            resultDiv.style.display = 'none';
+            resultDiv.classList.remove('error', 'success');
+            resultDiv.innerHTML = '';
+
+            // Send the image to the backend
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.classList.add('error');
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                } else {
+                    resultDiv.classList.add('success');
+                    resultDiv.innerHTML = `<strong>Predicted Class:</strong> ${data.predicted_class}<br>
+                                           <strong>Confidence:</strong> ${data.confidence.toFixed(2)}%`;
+                }
+                resultDiv.style.display = 'block';
+            })
+            .catch(error => {
+                resultDiv.classList.add('error');
+                resultDiv.innerHTML = `Error: ${error.message}`;
+                resultDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
